@@ -1,7 +1,4 @@
 {
   "userspace_version": "1.0",
-  "build_targets": [
-    ["zsa/voyager", "colombo"],
-    ["features"]
-  ]
+  "build_targets": [["zsa/voyager", "colombo"]]
 }
