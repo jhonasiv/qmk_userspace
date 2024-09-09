@@ -1,0 +1,17 @@
+#define BR_BSLS KC_NUBS
+#define BR_SCLN KC_SLSH
+#define BR_QUOT KC_GRV
+#define BR_SLSH KC_INT1
+#define BR_ACUT KC_LBRC
+#define BR_DQT S(KC_GRV)
+#define BR_NDCR ALGR(S(KC_QUOT))
+#define BR_RBRC KC_BSLS
+#define BR_PIPE S(KC_NUBS)
+#define BR_LCBR S(KC_RBRC)
+#define BR_RCBR S(KC_BSLS)
+#define BR_LBRC KC_RBRC
+#define BR_CIRC S(KC_QUOT)
+#define BR_NDAC ALGR(KC_LBRC)
+#define BR_TILD KC_QUOT
+#define BR_TRMA S(KC_6)
+#define BR_CCDL KC_SCLN
