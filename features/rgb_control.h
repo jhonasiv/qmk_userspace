@@ -11,6 +11,7 @@
  *
  */
  void init_rgb_state(void);
+ void disable_all(void);
 
 /**
  * \brief Enables blinking for an individual key with its own RGB color and pulse interval

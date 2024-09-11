@@ -16,6 +16,12 @@ void init_rgb_state(void) {
     if (rgb_control_init) {
         return;
     }
+    disable_all();
+    rgb_control_init = true;
+}
+
+void disable_all()
+{
     RGB off = {0, 0, 0};
     for (size_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
         color_map[i]             = off;
@@ -25,7 +31,6 @@ void init_rgb_state(void) {
         blink_ntimes_limit[i]    = UINT32_MAX;
         rgb_matrix_set_color(i, 0, 0, 0);
     }
-    rgb_control_init = true;
 }
 
 uint32_t synch_with_closest_blink(uint16_t interval, uint32_t time) {
