@@ -1,5 +1,5 @@
-#ifndef RGB_BLINKING_ANIMATION
-#define RGB_BLINKING_ANIMATION
+#ifndef RGB_CONTROL_ANIMATION
+#define RGB_CONTROL_ANIMATION
 
 #include <stdint.h>
 #include "color.h"
@@ -10,17 +10,12 @@
  * \defgroup rgb_blink RGB Blink animation for single keys.
  *
  */
-
-/**
- * \brief Deferred execution callback responsible for blinking each individual key when they are
- * due.
- */
-uint32_t blink_callback(uint32_t trigger_time, void *args);
+ void init_rgb_state(void);
 
 /**
  * \brief Enables blinking for an individual key with its own RGB color and pulse interval
  */
-void enable_blinking_for(uint8_t key_index, RGB color, uint32_t interval);
+void enable_blinking_for(uint8_t key_index, RGB color, uint32_t interval, uint32_t n_times);
 
 /**
  * \brief Disables blinking for an individual key
