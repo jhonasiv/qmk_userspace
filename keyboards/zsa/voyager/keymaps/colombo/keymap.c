@@ -51,21 +51,14 @@ const key_override_t **key_overrides =
 enum combos {
     ESC_COMBO,
     ENTER_COMBO,
-    LTAB_COMBO,
-    RTAB_COMBO,
-    BSPC_COMBO,
+    SYM_ENTER_COMBO,
+    NAV_ENTER_COMBO,
 
     // Layers
     //    SYM
     SYM_COMBO,
-    RSYM_COMBO,
-    SYM_LOCK_COMBO,
-    SYM_OUT_COMBO,
     //    NAV
     NAV_COMBO,
-    RNAV_COMBO,
-    NAV_LOCK_COMBO,
-    NAV_OUT_COMBO,
     //    MEDIA
     MEDIA_COMBO,
     MEDIA_LOCK_COMBO,
@@ -87,8 +80,10 @@ enum combos {
     USE_FREEZE_REPEAT,
 };
 
-const uint16_t esc_combo[] PROGMEM   = {KC_R, KC_S, COMBO_END};
-const uint16_t enter_combo[] PROGMEM = {KC_I, KC_E, COMBO_END};
+const uint16_t esc_combo[] PROGMEM       = {KC_R, KC_S, COMBO_END};
+const uint16_t enter_combo[] PROGMEM     = {KC_I, KC_E, COMBO_END};
+const uint16_t sym_enter_combo[] PROGMEM = {KC_EQL, KC_ASTERISK, COMBO_END};
+const uint16_t nav_enter_combo[] PROGMEM = {KC_UP, KC_DOWN, COMBO_END};
 
 // Layers
 //    SYM
@@ -119,6 +114,8 @@ const uint16_t use_freeze_repeat_combo[] = {KC_T, KC_G, COMBO_END};
 combo_t key_combos[] = {
     [ESC_COMBO]          = COMBO(esc_combo, KC_ESC),
     [ENTER_COMBO]        = COMBO(enter_combo, KC_ENTER),
+    [SYM_ENTER_COMBO]    = COMBO(sym_enter_combo, KC_ENTER),
+    [NAV_ENTER_COMBO]    = COMBO(nav_enter_combo, KC_ENTER),
 
     // Layers
     //    SYM
