@@ -1,24 +1,10 @@
-#include <math.h>
 #include <stdint.h>
-#include "action.h"
-#include "action_layer.h"
-#include "action_util.h"
-#include "color.h"
-#include "debug.h"
-#include "features/rgb_blink.h"
-#include "info_config.h"
-#include "keyboard.h"
+#include "features/rgb_control.h"
 #include "keycodes.h"
-#include "modifiers.h"
-#include "post_config.h"
-#include "quantum.h"
-#include "quantum_keycodes.h"
-#include "rgb_matrix.h"
-#include "rgb_matrix_types.h"
+#include "keymap_us.h"
 
 #include QMK_KEYBOARD_H
 #include "keymap_us_international_linux.h"
-#include "repeat_key.h"
 #include "features/leader_compose.h"
 
 enum layers { BASE, MOD, SYM, NAV, MEDIA, FN };
@@ -101,33 +87,14 @@ enum combos {
     USE_FREEZE_REPEAT,
 };
 
-const uint16_t esc_combo[] PROGMEM       = {KC_R, KC_S, COMBO_END};
-const uint16_t enter_combo[] PROGMEM     = {KC_I, KC_E, COMBO_END};
-// const uint16_t ltab_combo[] PROGMEM      = {KC_W, KC_F, COMBO_END};
-// const uint16_t rtab_combo[] PROGMEM      = {KC_L, KC_U, COMBO_END};
-// const uint16_t backspace_combo[] PROGMEM = {KC_COMMA, KC_DOT, COMBO_END};
-
-// Modifiers
-// const uint16_t lshift_combo[] PROGMEM      = {KC_A, KC_R, COMBO_END};
-// const uint16_t rshift_combo[] PROGMEM      = {KC_I, KC_O, COMBO_END};
-// const uint16_t lalt_combo[] PROGMEM        = {KC_Q, KC_W, COMBO_END};
-// const uint16_t ralt_combo[] PROGMEM        = {KC_U, KC_Y, COMBO_END};
-// const uint16_t lctrl_combo[] PROGMEM       = {KC_S, KC_T, COMBO_END};
-// const uint16_t rctrl_combo[] PROGMEM       = {KC_N, KC_E, COMBO_END};
-// const uint16_t lctrl_shift_combo[] PROGMEM = {KC_A, KC_R, KC_S, KC_T, COMBO_END};
-// const uint16_t rctrl_shift_combo[] PROGMEM = {KC_N, KC_E, KC_I, KC_O, COMBO_END};
+const uint16_t esc_combo[] PROGMEM   = {KC_R, KC_S, COMBO_END};
+const uint16_t enter_combo[] PROGMEM = {KC_I, KC_E, COMBO_END};
 
 // Layers
 //    SYM
-const uint16_t sym_combo[] PROGMEM      = {KC_Q, KC_W, COMBO_END};
-// const uint16_t rsym_combo[] PROGMEM     = {KC_K, KC_H, KC_COMMA, COMBO_END};
-// const uint16_t sym_lock_combo[] PROGMEM = {KC_Z, KC_X, KC_C, COMBO_END};
-// const uint16_t sym_out_combo[] PROGMEM  = {KC_LPRN, KC_RPRN, KC_LBRC, COMBO_END};
+const uint16_t sym_combo[] PROGMEM = {KC_Q, KC_W, COMBO_END};
 //    NAV
-const uint16_t nav_combo[] PROGMEM      = {KC_W, KC_F, COMBO_END};
-// const uint16_t rnav_combo[] PROGMEM     = {KC_H, KC_COMMA, KC_DOT, COMBO_END};
-// const uint16_t nav_lock_combo[] PROGMEM = {KC_X, KC_C, KC_D, COMBO_END};
-// const uint16_t nav_out_combo[] PROGMEM  = {KC_DOWN, KC_UP, KC_RIGHT, COMBO_END};
+const uint16_t nav_combo[] PROGMEM = {KC_W, KC_F, COMBO_END};
 //    MEDIA
 const uint16_t media_combo[] PROGMEM      = {KC_1, KC_2, COMBO_END};
 const uint16_t media_lock_combo[] PROGMEM = {KC_1, KC_2, KC_3, COMBO_END};
@@ -152,21 +119,12 @@ const uint16_t use_freeze_repeat_combo[] = {KC_T, KC_G, COMBO_END};
 combo_t key_combos[] = {
     [ESC_COMBO]          = COMBO(esc_combo, KC_ESC),
     [ENTER_COMBO]        = COMBO(enter_combo, KC_ENTER),
-    // [LTAB_COMBO]         = COMBO(ltab_combo, KC_TAB),
-    // [RTAB_COMBO]         = COMBO(rtab_combo, KC_TAB ),
-    // [BSPC_COMBO]         = COMBO(backspace_combo, KC_BSPC ),
 
     // Layers
     //    SYM
     [SYM_COMBO]          = COMBO(sym_combo, TG(SYM)),
-    // [RSYM_COMBO]         = COMBO(rsym_combo, OSL(SYM)),
-    // [SYM_LOCK_COMBO]     = COMBO(sym_lock_combo, TG(SYM)),
-    // [SYM_OUT_COMBO]      = COMBO(sym_out_combo, TG(SYM)),
     //    NAV
     [NAV_COMBO]          = COMBO(nav_combo, TG(NAV)),
-    // [RNAV_COMBO]         = COMBO(rnav_combo, OSL(NAV)),
-    // [NAV_LOCK_COMBO]     = COMBO(nav_lock_combo, TG(NAV)),
-    // [NAV_OUT_COMBO]      = COMBO(nav_out_combo, TG(NAV)),
     //    MEDIA
     [MEDIA_COMBO]        = COMBO(media_combo, OSL(MEDIA)),
     [MEDIA_LOCK_COMBO]   = COMBO(media_lock_combo, TG(MEDIA)),
@@ -238,8 +196,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*   ||             |           |     (     |     )     |     [     |    ]    ||       ||     +      |    -      |    =     |    *     |      /     |              | */
 /*   ||*/    ____   ,  ____     ,  KC_LPRN  ,  KC_RPRN  ,  KC_LBRC  ,  KC_RBRC ,             KC_PLUS ,  KC_MINUS , KC_EQUAL ,  KC_ASTR ,  KC_SLASH  ,    ____  ,/* |\ */
 /*   ---------------------------------------------------------------------------       ||-------------------------------------------------------------------------- */
-/*   ||             |           |           |           |           |         ||       ||            |           |          |          |            |              | */
-/*   || */   ____   ,  ____     ,  ____     ,  ____     ,  ____     ,  ____    ,             ____    ,  ____     ,   ____   ,   ____   ,    ____    ,    ____  ,/* |\  */
+/*   ||             |           |           |           |           |         ||       ||            |           |    <     |    >     |            |              | */
+/*   || */   ____   ,  ____     ,  ____     ,  ____     ,  ____     ,  ____    ,             ____    ,  ____     ,   KC_LT  ,   KC_GT  ,    ____    ,    ____  ,/* |\  */
 /*   ---------------------------------------------------------------------------       ||-------------------------------------------------------------------------- */
 /*                                                ||           |              ||       ||                |   LAYER OFF   || */
 /*                                                ||*/ ____    ,      ____     ,               ____      ,    TG(SYM) // ||
@@ -312,147 +270,30 @@ void keyboard_post_init_user(void) {
 // clang-format off
 const uint8_t PROGMEM keypos_to_led_map[MATRIX_ROWS][MATRIX_COLS] = LAYOUT_voyager(
 /*   --------------------------------------------------         ------------------------------------------------------------*/
-/*   || */   0    ,  1   ,  2   ,  3   ,  4   ,  5    ,            24    , 25  ,  26    ,  27     ,  28     ,    29  ,/* |\ */
+/*   || */    0   ,   1  ,   2  ,   3  ,   4  ,   5   ,            24    , 25  ,  26    ,  27     ,  28     ,    29  ,/* |\ */
 /*    -----------------------------------------------||         ||----------------------------------------------------------*/
-/*   || */   6    ,  7   ,  8   ,   9  ,  10  ,  11   ,            30    , 31  ,  32    ,  33     ,  34     ,    35  ,/* |\ */
+/*   || */    6   ,   7  ,   8  ,   9  ,  10  ,  11   ,            30    , 31  ,  32    ,  33     ,  34     ,    35  ,/* |\ */
 /*   ------------------------------------------------||         ||----------------------------------------------------------*/
-/*   ||*/    12   ,  13  ,  14  ,   15 ,  16  ,  17   ,            36    , 37  ,  38    ,  39     ,  40     ,    41  ,/* |\ */
+/*   ||*/    12   ,  13  ,  14  ,  15  ,  16  ,  17   ,            36    , 37  ,  38    ,  39     ,  40     ,    41  ,/* |\ */
 /*   ------------------------------------------------||         ||----------------------------------------------------------*/
-/*   || */   18   ,  19  ,  20   ,  21 ,  22  ,  23   ,            42    , 43  ,   44   ,   45   ,    46    ,    47  ,/* |\ */
+/*   || */   18   ,  19  ,  20  ,  21  ,  22  ,  23   ,            42    , 43  ,   44   ,   45   ,    46    ,    47  ,/* |\ */
 /*   ------------------------------------------------||         ||----------------------------------------------------------*/
-/*                       ||*/ 48    ,      49         ,            50    ,  51    // ||
-/*                        -----------------------------         ---------------------*/
+/*                                 ||*/   48  ,  49   ,            50    ,  51    // ||
+/*                                  -------------------         ---------------------*/
     );
 
 #define QK_ONE_SHOT_MOD_COUNT 8
+#define QK_LAYERS_SUPPORTING_LEDS 6
 
-const uint8_t PROGMEM osm_keys_led[][QK_ONE_SHOT_MOD_COUNT] = {
-    [BASE] = {UINT8_MAX},
-    [MOD]  = {14, 15, 13, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX},
-    [SYM] = {UINT8_MAX},
-    [NAV] = {UINT8_MAX},
-    [MEDIA] = {UINT8_MAX},
-    [FN] = {UINT8_MAX},
+const uint8_t PROGMEM osm_keys_led[QK_LAYERS_SUPPORTING_LEDS][QK_ONE_SHOT_MOD_COUNT] = {
+    [BASE] = {UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX},
+    [MOD]  = {       14,        15,        13, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX},
+    [SYM]  = {UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX},
+    [NAV]  = {UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX},
+    [MEDIA]= {UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX},
+    [FN]   = {UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX},
 };
 // clang-format on
-
-const uint8_t PROGMEM ledmap[][RGB_MATRIX_LED_COUNT][3] = {
-    [0] = {{0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},       {0, 0, 0},       {119, 240, 192}, {72, 240, 198},  {39, 247, 255},
-           {0, 218, 204},   {157, 218, 204}, {0, 0, 0},       {212, 218, 204}, {212, 218, 204},
-           {212, 218, 204}, {212, 218, 204}, {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 255},
-           {0, 0, 255},     {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},       {0, 0, 0},       {157, 218, 204}, {0, 218, 204},   {39, 247, 255},
-           {72, 240, 198},  {119, 240, 192}, {0, 0, 0},       {0, 0, 0},       {211, 218, 204},
-           {212, 218, 204}, {212, 218, 204}, {212, 218, 204}, {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 255},     {0, 0, 255}},
-
-    [1] = {{0, 0, 0},     {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204},
-           {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204},
-           {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204},
-           {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204},
-           {0, 0, 255},   {0, 0, 255},   {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},
-           {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 218, 204}, {0, 0, 0},     {0, 0, 0},
-           {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},
-           {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},
-           {0, 0, 0},     {0, 0, 0},     {0, 0, 255},   {0, 0, 255}},
-
-    [2] = {{0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},
-           {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 218, 204}, {0, 0, 0},
-           {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},
-           {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},     {0, 0, 0},
-           {0, 0, 255},   {0, 0, 255},   {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204},
-           {0, 218, 204}, {0, 0, 0},     {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204},
-           {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204},
-           {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204}, {0, 218, 204},
-           {0, 0, 0},     {0, 213, 199}, {0, 0, 255},   {0, 0, 255}},
-
-    [3] = {{0, 0, 0},   {0, 0, 0},   {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {39, 247, 255},
-           {0, 0, 0},   {0, 0, 0},   {39, 247, 255}, {39, 247, 255}, {39, 247, 255}, {39, 247, 255},
-           {0, 0, 0},   {0, 0, 0},   {39, 247, 255}, {39, 247, 255}, {39, 247, 255}, {39, 247, 255},
-           {0, 0, 0},   {0, 0, 0},   {39, 247, 255}, {39, 247, 255}, {39, 247, 255}, {39, 247, 255},
-           {0, 0, 255}, {0, 0, 255}, {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {0, 0, 0},
-           {0, 0, 0},   {0, 0, 0},   {0, 0, 0},      {0, 0, 0},      {39, 247, 255}, {0, 0, 0},
-           {0, 0, 0},   {0, 0, 0},   {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {0, 0, 0},
-           {0, 0, 0},   {0, 0, 0},   {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {0, 0, 0},
-           {0, 0, 0},   {0, 0, 0},   {0, 0, 255},    {0, 0, 255}},
-
-    [4] = {{0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {0, 0, 0},
-           {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {39, 247, 255},
-           {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {0, 0, 0},
-           {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {0, 0, 0},
-           {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {0, 0, 255},
-           {0, 0, 255},    {39, 247, 255}, {0, 0, 0},      {0, 0, 0},      {0, 0, 0},
-           {39, 247, 255}, {0, 0, 0},      {39, 247, 255}, {39, 247, 255}, {39, 247, 255},
-           {39, 247, 255}, {0, 0, 0},      {0, 0, 0},      {39, 247, 255}, {39, 247, 255},
-           {39, 247, 255}, {39, 247, 255}, {0, 0, 0},      {0, 0, 0},      {39, 247, 255},
-           {39, 247, 255}, {39, 247, 255}, {39, 247, 255}, {0, 0, 0},      {0, 0, 0},
-           {0, 0, 255},    {0, 0, 255}},
-
-    [5] = {{0, 0, 0},      {0, 0, 0},      {72, 240, 198}, {72, 240, 198}, {72, 240, 198},
-           {72, 240, 198}, {0, 0, 0},      {72, 240, 198}, {72, 240, 198}, {72, 240, 198},
-           {72, 240, 198}, {72, 240, 198}, {0, 0, 0},      {72, 240, 198}, {72, 240, 198},
-           {72, 240, 198}, {72, 240, 198}, {72, 240, 198}, {0, 0, 0},      {0, 0, 0},
-           {0, 0, 0},      {72, 240, 198}, {72, 240, 198}, {0, 0, 0},      {0, 0, 255},
-           {0, 0, 255},    {72, 240, 198}, {0, 0, 0},      {0, 0, 0},      {0, 0, 0},
-           {0, 0, 0},      {0, 0, 0},      {72, 240, 198}, {72, 240, 198}, {72, 240, 198},
-           {72, 240, 198}, {0, 0, 0},      {0, 0, 0},      {72, 240, 198}, {72, 240, 198},
-           {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {0, 0, 0},
-           {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {0, 0, 0},      {0, 0, 0},
-           {0, 0, 255},    {0, 0, 255}},
-
-    [6] = {{0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},       {119, 240, 192}, {119, 240, 192}, {119, 240, 192}, {119, 240, 192},
-           {119, 240, 192}, {119, 240, 192}, {119, 240, 192}, {119, 240, 192}, {119, 240, 192},
-           {119, 240, 192}, {119, 240, 192}, {119, 240, 192}, {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 255},
-           {0, 0, 255},     {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},       {0, 0, 0},       {119, 240, 192}, {119, 240, 192}, {119, 240, 192},
-           {119, 240, 192}, {119, 240, 192}, {119, 240, 192}, {119, 240, 192}, {119, 240, 192},
-           {119, 240, 192}, {119, 240, 192}, {119, 240, 192}, {119, 240, 192}, {0, 0, 0},
-           {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 255},     {0, 0, 255}},
-
-    [7] = {{0, 0, 0},   {0, 0, 0},   {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},   {0, 0, 0},   {157, 218, 204}, {157, 218, 204}, {157, 218, 204}, {0, 0, 0},
-           {0, 0, 0},   {0, 0, 0},   {157, 218, 204}, {157, 218, 204}, {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},   {0, 0, 0},   {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 255}, {0, 0, 255}, {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},   {0, 0, 0},   {157, 218, 204}, {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},   {0, 0, 0},   {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},   {0, 0, 0},   {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},   {0, 0, 0},   {0, 0, 255},     {0, 0, 255}},
-
-    [8] = {{0, 0, 0},   {0, 0, 0},   {0, 0, 0},   {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},   {0, 0, 0},   {0, 0, 0},   {0, 0, 0},       {0, 0, 0},       {157, 218, 204},
-           {0, 0, 0},   {0, 0, 0},   {0, 0, 0},   {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},   {0, 0, 0},   {0, 0, 0},   {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 255}, {0, 0, 255}, {0, 0, 0},   {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},   {0, 0, 0},   {0, 0, 0},   {157, 218, 204}, {157, 218, 204}, {157, 218, 204},
-           {0, 0, 0},   {0, 0, 0},   {0, 0, 0},   {0, 0, 0},       {157, 218, 204}, {157, 218, 204},
-           {0, 0, 0},   {0, 0, 0},   {0, 0, 0},   {0, 0, 0},       {0, 0, 0},       {0, 0, 0},
-           {0, 0, 0},   {0, 0, 0},   {0, 0, 255}, {0, 0, 255}},
-
-};
-
-// void set_layer_color(int layer) {
-//     for (int i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
-//         HSV hsv = {
-//             .h = pgm_read_byte(&ledmap[layer][i][0]),
-//             .s = pgm_read_byte(&ledmap[layer][i][1]),
-//             .v = pgm_read_byte(&ledmap[layer][i][2]),
-//         };
-//         if (!hsv.h && !hsv.s && !hsv.v) {
-//             rgb_matrix_set_color(i, 0, 0, 0);
-//         } else {
-//             RGB   rgb = hsv_to_rgb(hsv);
-//             float f   = (float)rgb_matrix_config.hsv.v / UINT8_MAX;
-//             rgb_matrix_set_color(i, f * rgb.r, f * rgb.g, f * rgb.b);
-//         }
-//     }
-// }
 
 bool rgb_matrix_indicators_user(void) {
     manage_blinking_keys();
@@ -521,43 +362,55 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
-void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
-    uint8_t active_oneshot_layer = get_oneshot_layer();
-    uint8_t key_index            = keypos_to_led_map[record->event.key.row][record->event.key.col];
-    dprintf("Active OSL: %u, Key index: %u, Keycode: 0x%04X Press: %d\n", active_oneshot_layer,
-            key_index, keycode, record->event.pressed);
-
-    if (active_oneshot_layer & MOD && record->event.pressed) {
-        switch (keycode) {
-            case OSM_ALT:
-            case OSM_LSHIFT:
-            case OSM_LCTRL: {
-                dprintf("Activating led for 0x%04X\n", keycode);
+uint8_t previous_active_oneshot_mods = 0;
+void    process_blinking_for_one_shot_mods(uint16_t keycode, keyrecord_t *record) {
+    uint8_t led_index = keypos_to_led_map[record->event.key.row][record->event.key.col];
+    switch (keycode) {
+        case OSM_ALT:
+        case OSM_LSHIFT:
+        case OSM_LCTRL:
+            if (record->event.pressed) {
                 RGB rgb = {RGB_YELLOW};
-                enable_blinking_for(key_index, rgb, 500);
+                enable_blinking_for(led_index, rgb, 500, UINT32_MAX);
                 break;
             }
+        default: {
+            uint8_t active_oneshot_mods = get_oneshot_mods();
+            if (previous_active_oneshot_mods == 0 && active_oneshot_mods == 0) {
+                break;
+            }
+            for (size_t i = 0; i < QK_ONE_SHOT_MOD_COUNT; i++) {
+                for (size_t j = 0; j < QK_LAYERS_SUPPORTING_LEDS; j++) {
+                    uint8_t osm_led     = osm_keys_led[j][i];
+                    uint8_t checked_mod = 1 << i;
+                    if (osm_led == UINT8_MAX) {
+                        continue;
+                    }
+                    dprintf("prev active: %u, active: %u, mod: %u, led: %u\n",
+                               previous_active_oneshot_mods, active_oneshot_mods, checked_mod,
+                               osm_led);
+                    if ((active_oneshot_mods & checked_mod) == 0 &&
+                        (previous_active_oneshot_mods & checked_mod) != 0) {
+                        RGB color = {0, 10, 100};
+                        enable_blinking_for(led_index, color, 2500, 3);
+                        enable_blinking_for(osm_led, color, 2500, 3);
+                    }
+                }
+            }
+            previous_active_oneshot_mods = active_oneshot_mods;
+            break;
         }
     }
+}
+
+void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
+#ifdef RGB_CONTROL_ENABLE
+    init_rgb_state();
+    process_blinking_for_one_shot_mods(keycode, record);
+#endif
 
     if (IS_QK_ONE_SHOT_MOD(keycode) && is_oneshot_layer_active() && record->event.pressed) {
         clear_oneshot_layer_state(ONESHOT_OTHER_KEY_PRESSED);
-    }
-    // if (IS_QK_ONE_SHOT_LAYER(keycode) && keycode == OSL(MOD) && !record->event.pressed) {
-    //     clear_oneshot_layer_state(ONESHOT_OTHER_KEY_PRESSED);
-    // }
-}
-
-void oneshot_mods_changed_user(uint8_t mods) {
-    for (size_t i = 0; i < QK_ONE_SHOT_MOD_COUNT; i++) {
-        uint8_t led         = osm_keys_led[MOD][i];
-        uint8_t checked_mod = 1 << i;
-        dprintf("Checking for mod %d in led %d while active mods are %d and it is blinking? %u\n",
-                checked_mod, led, mods, blinking_enabled_on_led(led));
-        if ((mods & checked_mod) == 0 && blinking_enabled_on_led(led)) {
-            dprintf("Disabling blink for %d\n", checked_mod);
-            disable_blinking_for(led);
-        }
     }
 }
 
