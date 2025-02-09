@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "action.h"
+#include "action_layer.h"
 #include "features/rgb_control.h"
 #include "keycodes.h"
 #include "keymap_us.h"
@@ -8,7 +9,7 @@
 #include "keymap_us_international_linux.h"
 #include "features/leader_compose.h"
 
-enum layers { BASE, MOD, SYM, NAV, MEDIA, FN, GAMING };
+enum layers { BASE, MOD, SYM, NAV, MEDIA, FN, GAMING, GAMING_ALT };
 
 #define OSM_LSHIFT OSM(MOD_LSFT)
 #define OSM_RSHIFT OSM(MOD_RSFT)
@@ -36,7 +37,10 @@ enum custom_keycodes {
     CUSTOM_REPEAT,
     ALT_CUSTOM_REPEAT,
     ALT_TAB,
+    QUICK_LAYER_OFF
 };
+
+#define QLO QUICK_LAYER_OFF
 
 #define FREEZE_REP     FREEZE_REPEAT_REGISTER
 #define FREEZE_REP_TOG FREEZE_REPEAT_ENABLE
@@ -58,6 +62,7 @@ enum combos {
     // Layers
     //    SYM
     SYM_COMBO,
+    RSYM_COMBO,
     //    NAV
     NAV_COMBO,
     //    MEDIA
@@ -79,6 +84,25 @@ enum combos {
 
     // CUSTOM KEYS;
     USE_FREEZE_REPEAT,
+
+    // GAMING KEYS
+    GMG_ENTER,
+    GMG_6,
+    GMG_7,
+    GMG_8,
+    GMG_9,
+    GMG_0,
+    GMG_F6,
+    GMG_F7,
+    GMG_F8,
+    GMG_F9,
+    GMG_F10,
+    GMG_F11,
+    GMG_F12,
+    GMG_TAB,
+    GMG_I,
+    GMG_P,
+    GMG_M,
 };
 
 const uint16_t esc_combo[] PROGMEM       = {KC_R, KC_S, COMBO_END};
@@ -88,7 +112,8 @@ const uint16_t nav_enter_combo[] PROGMEM = {KC_UP, KC_DOWN, COMBO_END};
 
 // Layers
 //    SYM
-const uint16_t sym_combo[] PROGMEM = {KC_Q, KC_W, COMBO_END};
+const uint16_t sym_combo[] PROGMEM  = {KC_W, KC_P, COMBO_END};
+const uint16_t rsym_combo[] PROGMEM = {KC_L, KC_Y, COMBO_END};
 //    NAV
 const uint16_t nav_combo[] PROGMEM = {KC_W, KC_F, COMBO_END};
 //    MEDIA
@@ -106,10 +131,29 @@ const uint16_t acute_combo[] PROGMEM     = {KC_Y, KC_SEMICOLON, COMBO_END};
 const uint16_t cedilha_combo[] PROGMEM   = {KC_O, US_DQUO, COMBO_END};
 const uint16_t circ_combo[] PROGMEM      = {KC_6, KC_J, COMBO_END};
 const uint16_t tilde_combo[] PROGMEM     = {KC_5, KC_B, COMBO_END};
-const uint16_t underline_combo[] PROGMEM = {KC_M, KC_N, COMBO_END};
+const uint16_t underline_combo[] PROGMEM = {KC_N, KC_E, COMBO_END};
 
 // Custom Keys
 const uint16_t use_freeze_repeat_combo[] = {KC_T, KC_G, COMBO_END};
+
+// Gaming combos
+const uint16_t gaming_enter[] = {KC_Q, KC_E, COMBO_END};
+const uint16_t gaming_6[]     = {KC_ESC, KC_1, COMBO_END};
+const uint16_t gaming_7[]     = {KC_1, KC_2, COMBO_END};
+const uint16_t gaming_8[]     = {KC_2, KC_3, COMBO_END};
+const uint16_t gaming_9[]     = {KC_3, KC_4, COMBO_END};
+const uint16_t gaming_0[]     = {KC_4, KC_5, COMBO_END};
+const uint16_t gaming_tab[]   = {KC_R, KC_T, COMBO_END};
+const uint16_t gaming_p[]     = {KC_E, KC_R, COMBO_END};
+const uint16_t gaming_i[]     = {KC_E, KC_T, COMBO_END};
+const uint16_t gaming_m[]     = {KC_F, KC_G, COMBO_END};
+const uint16_t gaming_f6[]    = {KC_ESC, KC_F1, COMBO_END};
+const uint16_t gaming_f7[]    = {KC_F1, KC_F2, COMBO_END};
+const uint16_t gaming_f8[]    = {KC_F2, KC_F3, COMBO_END};
+const uint16_t gaming_f9[]    = {KC_F3, KC_F4, COMBO_END};
+const uint16_t gaming_f10[]   = {KC_F4, KC_F5, COMBO_END};
+const uint16_t gaming_f11[]   = {KC_F1, KC_F2, KC_F3, COMBO_END};
+const uint16_t gaming_f12[]   = {KC_F2, KC_F3, KC_F4, COMBO_END};
 
 // clang-format off
 combo_t key_combos[] = {
@@ -120,9 +164,10 @@ combo_t key_combos[] = {
 
     // Layers
     //    SYM
-    [SYM_COMBO]          = COMBO(sym_combo, TG(SYM)),
+    [SYM_COMBO]          = COMBO(sym_combo, OSL(SYM)),
+    [RSYM_COMBO]         = COMBO(rsym_combo, OSL(SYM)),
     //    NAV
-    [NAV_COMBO]          = COMBO(nav_combo, TG(NAV)),
+    [NAV_COMBO]          = COMBO(nav_combo, MO(NAV)),
     //    MEDIA
     [MEDIA_COMBO]        = COMBO(media_combo, OSL(MEDIA)),
     [MEDIA_LOCK_COMBO]   = COMBO(media_lock_combo, TG(MEDIA)),
@@ -142,6 +187,25 @@ combo_t key_combos[] = {
 
     // Custom
     [USE_FREEZE_REPEAT]  = COMBO(use_freeze_repeat_combo, FREEZE_REP_TOG),
+
+    // Gaming
+    [GMG_ENTER] = COMBO(gaming_enter, KC_ENTER),
+    [GMG_6]   = COMBO(gaming_6, KC_6),
+    [GMG_7]   = COMBO(gaming_7, KC_7),
+    [GMG_8]   = COMBO(gaming_8, KC_8),
+    [GMG_9]   = COMBO(gaming_9, KC_9),
+    [GMG_0]   = COMBO(gaming_0, KC_0),
+    [GMG_F6]  = COMBO(gaming_f6, KC_F6),
+    [GMG_F7]  = COMBO(gaming_f7, KC_F7),
+    [GMG_F8]  = COMBO(gaming_f8, KC_F8),
+    [GMG_F9]  = COMBO(gaming_f9, KC_F9),
+    [GMG_F10] = COMBO(gaming_f10, KC_F10),
+    [GMG_F11] = COMBO(gaming_f11, KC_F11),
+    [GMG_F12] = COMBO(gaming_f12, KC_F12),
+    [GMG_TAB] = COMBO(gaming_tab, KC_TAB),
+    [GMG_I]   = COMBO(gaming_i, KC_I),
+    [GMG_P]   = COMBO(gaming_p, KC_P),
+    [GMG_M]   = COMBO(gaming_m, KC_M),
 };
 // clang-format on
 
@@ -169,9 +233,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*   ---------------------------------------------------------------------------        ---------------------------------------------------------------------------------- */
 /*   ||             |           |           |           |           |         ||       ||             |          |                |           |           |              | */
 /*   || */   ____   ,  ____     ,  ____     ,  ____     ,  ____     ,  ____    ,              ____    ,  ____    ,  ____          ,  ____     ,  ____     ,    ____  ,/* |\ */
-/*    r-------------------------------------------------------------------------       ||--------------------------------------------------------------------------------- */
+/*   ---------------------------------------------------------------------------       ||--------------------------------------------------------------------------------- */
 /*   ||             |           |           |           |           |         ||       ||   GAMING    |           | RGB TOG       |          |            |              | */
-/*   || */   ____   ,  ____     ,  ____     ,  ____     ,   ____    ,  ____    ,          TG(GAMING)  ,  ____     , RGB_CTRL_TOG  ,   ____   ,    ____    ,    ____  ,/* |\ */
+/*   || */   ____   ,  ____     ,  ____     ,  ____     ,   ____    ,  ____    ,          DF(GAMING)  ,  ____     , RGB_CTRL_TOG  ,   ____   ,    ____    ,    ____  ,/* |\ */
 /*   ---------------------------------------------------------------------------        ---------------------------------------------------------------------------------- */
 /*   ||             |  OSM_ALT  | OSM_LCTRL |OSM_LSHIFT |    TAB    |         ||       ||             |  BSPACE   |               |          |            |              | */
 /*   ||*/    ____   ,  OSM_ALT  , OSM_LCTRL ,OSM_LSHIFT ,  KC_TAB   ,  ____    ,             ____     ,  KC_BSPC  ,   ____        ,   ____   ,    ____    ,    ____  ,/* |\ */
@@ -198,7 +262,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*   || */   ____   ,  ____     ,  ____     ,  ____     ,  ____     ,  ____    ,             ____    ,  ____     ,   KC_LT  ,   KC_GT  ,    ____    ,    ____  ,/* |\  */
 /*   ---------------------------------------------------------------------------       ||-------------------------------------------------------------------------- */
 /*                                                ||           |              ||       ||                |   LAYER OFF   || */
-/*                                                ||*/ ____    ,      ____     ,               ____      ,    TG(SYM) // ||
+/*                                                ||*/ ____    ,      ____     ,               ____      ,    QLO     // ||
 /*                                                 -----------------------------       ||-------------------------- */
     ),
     [NAV] = LAYOUT_voyager(
@@ -216,7 +280,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*   || */   ____   ,  KC_HOME     ,  KC_PGDN     ,  KC_PGUP   ,  KC_END      ,  ____    ,           ____   ,  KC_HOME     ,  KC_PGDN     ,  KC_PGUP   ,  KC_END      ,  ____    ,/* |\ */
 /*   -------------------------------------------------------------------------------------        ------------------------------------------------------------------------------------*/
 /*                                                       ||   LSHIFT        |           ||       ||                |   LAYER OFF   || */
-/*                                                       ||*/ KC_LEFT_SHIFT ,   ____     ,               ____      ,    TG(NAV) // ||
+/*                                                       ||*/ KC_LEFT_SHIFT ,   ____     ,               ____      ,   QLO      // ||
 /*                                                        --------------------------------       ||-------------------------- */
     ),
     [MEDIA] = LAYOUT_voyager(
@@ -234,7 +298,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*   || */ ____   ,  ____   ,    ____      ,  ____      ,     ____     ,      ____       ,           ____   ,     ____     ,     ____     ,    ____    ,      ____    ,  ____    ,/* |\ */
 /*   -------------------------------------------------------------------------------------       ||-----------------------------------------------------------------------------------*/
 /*                                                          ||           |              ||       ||                |   LAYER OFF   || */
-/*                                                          ||*/ ____    ,      ____     ,               ____      ,   TG(MEDIA)// ||
+/*                                                          ||*/ ____    ,      ____     ,               ____      ,   QLO      // ||
 /*                                                           -----------------------------       ||--------------------------------- */
     ),
     [FN] = LAYOUT_voyager(
@@ -252,7 +316,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*   || */   ____   ,  ____     ,  KC_F7     ,  KC_F8   ,  KC_F9    ,  ____    ,             ____    ,  ____           ,   ____   ,   ____   ,    ____    ,    ____  ,/* |\  */
 /*   ---------------------------------------------------------------------------       ||--------------------------------------------------------------------------------- */
 /*                                                ||           |              ||       ||                |   LAYER OFF   || */
-/*                                                ||*/ ____    ,      ____     ,               ____      ,    TG(FN)  // ||
+/*                                                ||*/ ____    ,      ____     ,               ____      ,    QLO     // ||
 /*                                                 -----------------------------       ||-------------------------- */
     ),
     [GAMING] = LAYOUT_voyager(
@@ -266,11 +330,29 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*   ||     SHIFT   |    A      |    S      |    D      |    F      |   G     ||       ||     H       |    J      |    K      |    L      |    ;      |              | */
 /*   ||*/ KC_LSFT   ,  KC_A     ,  KC_S     ,   KC_D    ,   KC_F    ,  KC_G    ,            KC_H      ,  KC_J     ,  KC_K     ,   KC_L    , KC_SCLN   ,  ____    ,/* |\*/
 /*   ---------------------------------------------------------------------------       ------------------------------------------------------------------------------- */
-/*   ||  SWAP HANDS |   Z       |    X      |    C      |    V      |   B     ||       ||     N       |   M       |    ,      |    .      |    /      |   SWAP HANDS | */
-/*   || */   SH_TT  ,  KC_Z     ,   KC_X    ,   KC_C    ,   KC_V    ,  KC_B    ,            KC_N      ,  KC_M     , KC_COMM   ,   KC_DOT  , KC_SLSH   ,    SH_TT ,/* |\*/
+/*   ||  LEFT ALT   |   Z       |    X      |    C      |    V      |   B     ||       ||     N       |   M       |    ,      |    .      |    /      |   SWAP HANDS | */
+/*   || */ KC_LALT  ,  KC_Z     ,   KC_X    ,   KC_C    ,   KC_V    ,  KC_B    ,            KC_N      ,  KC_M     , KC_COMM   ,   KC_DOT  , KC_SLSH   ,    SH_TT ,/* |\*/
 /*   ---------------------------------------------------------------------------       ||----------------------------------------------------------------------------- */
-/*                                                ||   SPACE   |     ENTER    ||       ||                |   LAYER OFF   || */
-/*                                                ||*/ KC_SPC  ,   KC_ENTER    ,               ____      ,   TG(GAMING)
+/*                                                ||   SPACE   |  GAMING ALT  ||       ||                |   LAYER OFF   || */
+/*                                                ||*/ KC_SPC  , TG(GAMING_ALT),               ____      ,   DF(BASE)
+/*                                                 -----------------------------       ||-------------------------- */
+    ),
+    [GAMING_ALT] = LAYOUT_voyager(
+/*   ---------------------------------------------------------------------------        ------------------------------------------------------------------------------ */
+/*   ||             |    F1     |    F2     |    F3     |    F4     |     F5   ||       ||             |           |           |           |           |              | */
+/*   || */ ____     ,  KC_F1    ,  KC_F2    ,  KC_F3    ,  KC_F4    ,  KC_F5   ,              ____    ,  ____     ,  ____     ,  ____     ,  ____     ,  ____ ,   /* |\*/
+/*    --------------------------------------------------------------------------        ------------------------------------------------------------------------------ */
+/*   ||             |           |   UP      |           |           |         ||       ||             |           |           |           |           |              | */
+/*   || */ ____     ,   ____    ,  KC_UP    ,   ____    ,   ____    ,  ____    ,             ____     ,   ____    ,  ____     ,   ____    ,   ____    ,  ____  ,/*   |\*/
+/*   ---------------------------------------------------------------------------       ------------------------------------------------------------------------------- */
+/*   ||             |  LEFT     |   DOWN    |   RIGHT   |           |         ||       ||             |           |           |           |           |              | */
+/*   ||*/ ____      ,  KC_LEFT  ,  KC_DOWN  , KC_RIGHT  ,   ____    ,  ____    ,            ____      ,  ____     ,  ____     ,   ____    ,    ____   ,  ____    ,/* |\*/
+/*   ---------------------------------------------------------------------------       ------------------------------------------------------------------------------- */
+/*   ||             |           |           |           |           |         ||       ||             |           |           |           |           |             | */
+/*   || */ ____     ,  ____     ,   ____    ,   ____    ,   ____    ,  ____    ,            ____      ,  ____     ,    ____   ,   ____    ,    ____   ,    ____ ,/* |\*/
+/*   ---------------------------------------------------------------------------       ||----------------------------------------------------------------------------- */
+/*                                                ||           |              ||       ||                |   LAYER OFF   || */
+/*                                                ||*/ ____    ,TG(GAMING_ALT) ,               ____      ,   QLO
 /*                                                 -----------------------------       ||-------------------------- */
     ),
 
@@ -331,49 +413,42 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     // dprintf("KL: kc: 0x%04X, col: %2u, row: %2u, pressed: %u, time: %5u, int: %u, count: %u\n",
     //         keycode, record->event.key.col, record->event.key.row, record->event.pressed,
     //         record->event.time, record->tap.interrupted, record->tap.count);
-    keyrecord_t registered_record = {0};
+    // keyrecord_t registered_record = {0};
     switch (keycode) {
         case RGB_CTRL_TOG:
-         disable_all();
-        case FREEZE_REPEAT_REGISTER:
+            disable_all();
+            return false;
+        case QUICK_LAYER_OFF:
             if (record->event.pressed) {
-                frozen_key_repeat.keycode = get_last_keycode();
-                frozen_mod_repeat         = get_last_mods();
+                layer_off(get_highest_layer(layer_state));
             }
             return false;
-        case FREEZE_REP_TOG:
+        case QK_TOGGLE_LAYER ... QK_TOGGLE_LAYER_MAX: {
             if (record->event.pressed) {
-                freeze_key_repeat = !freeze_key_repeat;
-
-                if (!freeze_key_repeat) {
-                    set_last_keycode(get_last_keycode());
+                action_t      action = action_for_keycode(keycode);
+                uint8_t       shift  = action.layer_bitop.part * 4;
+                layer_state_t bits   = ((layer_state_t)action.layer_bitop.bits) << shift;
+                layer_state_t mask =
+                    (action.layer_bitop.xbit) ? ~(((layer_state_t)0xf) << shift) : 0;
+                switch (action.layer_bitop.op) {
+                    case OP_BIT_AND:
+                        layer_and(bits | mask);
+                        break;
+                    case OP_BIT_OR:
+                        layer_or(bits | mask);
+                        break;
+                    case OP_BIT_XOR:
+                        layer_xor(bits | mask);
+                        break;
+                    case OP_BIT_SET:
+                        layer_state_set(bits | mask);
+                        break;
                 }
             }
             return false;
-        case CUSTOM_REPEAT:
-            if (freeze_key_repeat) {
-                if (!frozen_key_repeat.keycode) {
-                    return false;
-                }
-                uint16_t last_mods    = get_last_mods();
-                uint16_t last_keycode = get_last_keycode();
-                register_weak_mods(frozen_mod_repeat);
-                registered_record       = frozen_key_repeat;
-                registered_record.event = record->event;
-                process_record(&registered_record);
-
-                set_last_keycode(last_keycode);
-                set_last_mods(last_mods);
-                if (!record->event.pressed) {
-                    unregister_weak_mods(frozen_mod_repeat);
-                }
-            } else {
-                registered_record.keycode = QK_REP;
-                registered_record.event   = record->event;
-                process_record(&registered_record);
-            }
-            return false;
+        }
     }
+
 #ifdef LEADER_COMPOSE_ENABLE
     return process_leader_compose(keycode, record);
 #endif
@@ -434,10 +509,11 @@ void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 bool combo_should_trigger(uint16_t combo_index, combo_t *combo, uint16_t keycode,
                           keyrecord_t *record) {
-    if (layer_state_is(GAMING)) {
-        return false;
+    if (layer_state_cmp(layer_state | default_layer_state, GAMING) ||
+        layer_state_cmp(layer_state | default_layer_state, GAMING_ALT)) {
+        return combo_index >= GMG_ENTER;
     }
-    return true;
+    return combo_index < GMG_ENTER;
 }
 
 bool remember_last_key_user(uint16_t keycode, keyrecord_t *record, uint8_t *remembered_mods) {
