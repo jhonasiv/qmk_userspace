@@ -6,4 +6,3 @@ DEFERRED_EXEC_ENABLE = yes
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 include ${ROOT_DIR}../../../../../rules.mk
 ORYX_ENABLE = yes
-RGB_MATRIX_CUSTOM_KB = yes

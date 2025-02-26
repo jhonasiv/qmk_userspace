@@ -1,7 +1,7 @@
-#include "rgb_control.h"
 #include "color.h"
 #include "debug.h"
 #include "info_config.h"
+#include "rgb_control.h"
 #include "rgb_matrix.h"
 
 RGB      color_map[RGB_MATRIX_LED_COUNT]             = {};
@@ -20,8 +20,7 @@ void init_rgb_state(void) {
     rgb_control_init = true;
 }
 
-void disable_all()
-{
+void disable_all() {
     RGB off = {0, 0, 0};
     for (size_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
         color_map[i]             = off;
@@ -33,7 +32,7 @@ void disable_all()
     }
 }
 
-uint32_t synch_with_closest_blink(uint16_t interval, uint32_t time) {
+uint32_t sync_with_closest_blink(uint16_t interval, uint32_t time) {
     uint32_t closest_deadline = UINT32_MAX;
     for (size_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
         uint32_t deadline = blink_timer_deadlines[i];
@@ -52,7 +51,7 @@ uint32_t synch_with_closest_blink(uint16_t interval, uint32_t time) {
 }
 
 void enable_blinking_for(uint8_t key_index, RGB color, uint32_t interval, uint32_t n_times) {
-    blink_timer_deadlines[key_index] = synch_with_closest_blink(interval, timer_read32());
+    blink_timer_deadlines[key_index] = sync_with_closest_blink(interval, timer_read32());
     color_map[key_index]             = color;
     blink_interval[key_index]        = interval;
     blink_ntimes_limit[key_index]    = n_times;
@@ -82,12 +81,12 @@ void manage_blink_deadline(size_t led_index, uint32_t trigger_time) {
         disable_blinking_for(led_index);
     }
 
-    uint32_t interval      = blink_interval[led_index];
+    uint32_t interval = blink_interval[led_index];
     if (interval == UINT32_MAX) {
         blink_timer_deadlines[led_index] = UINT32_MAX;
         return;
     }
-    uint64_t next_deadline = trigger_time + interval;
+    uint64_t next_deadline           = trigger_time + interval;
     blink_timer_deadlines[led_index] = next_deadline;
 }
 

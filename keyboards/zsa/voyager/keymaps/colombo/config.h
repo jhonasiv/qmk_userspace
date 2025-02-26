@@ -9,6 +9,7 @@
 #    define ORYX_CONFIGURATOR
 #endif
 
+#define NO_USB_STARTUP_CHECK
 #define USB_SUSPEND_WAKEUP_DELAY 0
 #define FIRMWARE_VERSION         u8"aZW3V/mAX9X"
 #define RAW_USAGE_PAGE           0xFF60

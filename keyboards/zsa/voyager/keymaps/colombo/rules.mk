@@ -6,7 +6,6 @@ DEFERRED_EXEC_ENABLE = yes
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 include ${ROOT_DIR}../../../../../rules.mk
 ORYX_ENABLE = yes
-RGB_MATRIX_CUSTOM_KB = yes
 
 LTO_ENABLE = yes
 COMMAND_ENABLE = no
@@ -21,11 +20,14 @@ REPEAT_KEY_ENABLE = yes
 CONSOLE_ENABLE = yes
 CAPS_WORD_ENABLE = yes
 DEFERRED_EXEC_ENABLE = yes
+LAYER_LOCK_ENABLE = yes
+TAP_DANCE_ENABLE = yes
 
 RGB_CONTROL_ENABLE = yes
 ifeq ($(strip $(RGB_CONTROL_ENABLE)), yes)
 	OPT_DEFS += -DRGB_CONTROL_ENABLE
 	SRC += features/rgb_control.c
+	HEADERS += features/rgb_control.h
 endif
 
 LEADER_COMPOSE_ENABLE = no
