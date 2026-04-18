@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include "action.h"
-#include "features/rgb_control.h"
+#include "features/rgb_effects.h"
 #include "keycodes.h"
 #include "keymap_us.h"
 #include "modifiers.h"
@@ -334,46 +334,33 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 extern rgb_config_t rgb_matrix_config;
 
 void keyboard_post_init_user(void) {
-    rgb_matrix_mode(RGB_MATRIX_NONE);
 }
 
 // clang-format off
 const uint8_t PROGMEM keypos_to_led_map[MATRIX_ROWS][MATRIX_COLS] = LAYOUT_voyager(
 /*   --------------------------------------------------         ------------------------------------------------------------*/
-/*   || */    0   ,   1  ,   2  ,   3  ,   4  ,   5   ,            24    , 25  ,  26    ,  27     ,  28     ,    29  ,/* |\ */
+/*   || */    0   ,   1  ,   2  ,   3  ,   4  ,   5   ,            26    , 27  ,  28    ,  29     ,  30     ,    31  ,/* |\ */
 /*    -----------------------------------------------||         ||----------------------------------------------------------*/
-/*   || */    6   ,   7  ,   8  ,   9  ,  10  ,  11   ,            30    , 31  ,  32    ,  33     ,  34     ,    35  ,/* |\ */
+/*   || */    6   ,   7  ,   8  ,   9  ,  10  ,  11   ,            32    , 33  ,  34    ,  35     ,  36     ,    37  ,/* |\ */
 /*   ------------------------------------------------||         ||----------------------------------------------------------*/
-/*   ||*/    12   ,  13  ,  14  ,  15  ,  16  ,  17   ,            36    , 37  ,  38    ,  39     ,  40     ,    41  ,/* |\ */
+/*   ||*/    12   ,  13  ,  14  ,  15  ,  16  ,  17   ,            38    , 39  ,  40    ,  41     ,  42     ,    43  ,/* |\ */
 /*   ------------------------------------------------||         ||----------------------------------------------------------*/
-/*   || */   18   ,  19  ,  20  ,  21  ,  22  ,  23   ,            42    , 43  ,   44   ,   45   ,    46    ,    47  ,/* |\ */
+/*   || */   18   ,  19  ,  20  ,  21  ,  22  ,  23   ,            44    , 45  ,   46   ,  47     ,   48    ,    49  ,/* |\ */
 /*   ------------------------------------------------||         ||----------------------------------------------------------*/
-/*                                 ||*/   48  ,  49   ,            50    ,  51    // ||
+/*                                 ||*/   24  ,  25   ,            50    ,  51    // ||
 /*                                  -------------------         ---------------------*/
     );
 
-#define QK_ONE_SHOT_MOD_COUNT 8
-#define QK_LAYERS_SUPPORTING_LEDS 6
-
-const uint8_t PROGMEM osm_keys_led[QK_LAYERS_SUPPORTING_LEDS][QK_ONE_SHOT_MOD_COUNT] = {
-    [BASE] = {UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX},
-    [MOD]  = {       14,        15,        13, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX},
-    [SYM]  = {UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX},
-    [NAV]  = {UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX},
-    [MEDIA]= {UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX},
-    [FN]   = {UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX},
-};
 // clang-format on
 
 bool rgb_matrix_indicators_user(void) {
-    manage_blinking_keys();
+    rgb_effects_process();
     return true;
 }
 
 keyrecord_t frozen_key_repeat = {0};
 uint16_t    frozen_mod_repeat = 0;
-bool        freeze_key_repeat = false;
-bool        is_alt_tab_active = false;
+bool freeze_key_repeat = false;
 
 void matrix_scan_user(void) {
 #ifdef LEADER_COMPOSE_ENABLE
@@ -388,7 +375,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     keyrecord_t registered_record = {0};
     switch (keycode) {
         case RGB_CTRL_TOG:
-            disable_all();
+            rgb_effects_init();
         case FREEZE_REPEAT_REGISTER:
             if (record->event.pressed) {
                 frozen_key_repeat.keycode = get_last_keycode();
@@ -434,51 +421,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
-uint8_t previous_active_oneshot_mods = 0;
-void    process_blinking_for_one_shot_mods(uint16_t keycode, keyrecord_t *record) {
-    uint8_t led_index = keypos_to_led_map[record->event.key.row][record->event.key.col];
-    switch (keycode) {
-        case OSM_ALT:
-        case OSM_LSHIFT:
-        case OSM_LCTRL:
-            if (record->event.pressed) {
-                RGB rgb = {RGB_YELLOW};
-                enable_blinking_for(led_index, rgb, 500, UINT32_MAX);
-                break;
-            }
-        default: {
-            uint8_t active_oneshot_mods = get_oneshot_mods();
-            if (previous_active_oneshot_mods == 0 && active_oneshot_mods == 0) {
-                break;
-            }
-            for (size_t i = 0; i < QK_ONE_SHOT_MOD_COUNT; i++) {
-                for (size_t j = 0; j < QK_LAYERS_SUPPORTING_LEDS; j++) {
-                    uint8_t osm_led     = osm_keys_led[j][i];
-                    uint8_t checked_mod = 1 << i;
-                    if (osm_led == UINT8_MAX) {
-                        continue;
-                    }
-                    dprintf("prev active: %u, active: %u, mod: %u, led: %u\n",
-                               previous_active_oneshot_mods, active_oneshot_mods, checked_mod,
-                               osm_led);
-                    if ((active_oneshot_mods & checked_mod) == 0 &&
-                        (previous_active_oneshot_mods & checked_mod) != 0) {
-                        RGB color = {0, 10, 100};
-                        enable_blinking_for(led_index, color, 2500, 3);
-                        enable_blinking_for(osm_led, color, 2500, 3);
-                    }
-                }
-            }
-            previous_active_oneshot_mods = active_oneshot_mods;
-            break;
-        }
-    }
-}
-
 void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
-#ifdef RGB_CONTROL_ENABLE
-    init_rgb_state();
-    // process_blinking_for_one_shot_mods(keycode, record);
+#ifdef RGB_EFFECTS_ENABLE
+    rgb_effects_record(keycode, record);
 #endif
 
     if (IS_QK_ONE_SHOT_MOD(keycode) && is_oneshot_layer_active() && record->event.pressed) {

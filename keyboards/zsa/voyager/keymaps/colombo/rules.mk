@@ -23,11 +23,13 @@ DEFERRED_EXEC_ENABLE = yes
 LAYER_LOCK_ENABLE = yes
 TAP_DANCE_ENABLE = yes
 
-RGB_CONTROL_ENABLE = yes
-ifeq ($(strip $(RGB_CONTROL_ENABLE)), yes)
-	OPT_DEFS += -DRGB_CONTROL_ENABLE
-	SRC += features/rgb_control.c
-	HEADERS += features/rgb_control.h
+RGB_EFFECTS_ENABLE = yes
+ifeq ($(strip $(RGB_EFFECTS_ENABLE)), yes)
+	OPT_DEFS += -DRGB_EFFECTS_ENABLE
+	SRC += features/rgb_effects.c
+	SRC += features/rgb_effect_fade.c
+	SRC += features/rgb_effect_modifier.c
+	SRC += features/rgb_effect_layer.c
 endif
 
 LEADER_COMPOSE_ENABLE = no
